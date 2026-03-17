@@ -1,16 +1,14 @@
-import { auth } from "@/lib/auth";
+/**
+ * 軽量ミドルウェア（Edge 1MB 制限対応）
+ * admin / mypage の認証は各 layout で実施
+ */
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default auth((req) => {
-  const isAdmin = req.nextUrl.pathname.startsWith("/admin");
-  const isMyPage = req.nextUrl.pathname.startsWith("/mypage");
-  if ((isAdmin || isMyPage) && !req.auth) {
-    const url = new URL("/login", req.url);
-    url.searchParams.set("callbackUrl", req.nextUrl.pathname);
-    return Response.redirect(url);
-  }
-  return undefined;
-});
+export function middleware(_request: NextRequest) {
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ["/admin/:path*", "/mypage/:path*"],
+  matcher: [],
 };
