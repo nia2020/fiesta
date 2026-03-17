@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+html {
+  color-scheme: light;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #333333;
+  --muted: #666666;
+  --muted-light: #999999;
+  --border: #e8e8e8;
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
+  --primary-muted: #f5f3ff;
+  --accent: #8b5cf6;
+  --card: #ffffff;
+  --card-hover: #f8f7ff;
+  --section-bg: #fafafa;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* モダンなフォーカスリング */
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
