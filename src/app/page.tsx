@@ -88,14 +88,9 @@ export default async function HomePage() {
             height={72}
             className="mb-6 object-contain drop-shadow-lg"
           />
-          <h1 className="mb-4 text-2xl font-bold text-white sm:text-3xl">
-            お気に入りの学園祭が見つかる
-            <br className="sm:hidden" />
-            大学学園祭検索サイト
+          <h1 className="mb-8 text-2xl font-bold text-white sm:text-3xl">
+            全国の大学学園祭特集サイト
           </h1>
-          <p className="mb-8 text-white/90">
-            委員長・組織紹介、引き継ぎ履歴、テーマ、協賛プラン
-          </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/universities"
