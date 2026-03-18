@@ -15,7 +15,7 @@ export default function SeedSetupPage() {
       const res = await fetch("/api/admin/seed-articles", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "エラーが発生しました");
+        setError(data.error ?? data.message ?? "エラーが発生しました");
         return;
       }
       setResult(data.message ?? "完了しました");

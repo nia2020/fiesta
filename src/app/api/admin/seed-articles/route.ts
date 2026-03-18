@@ -1,13 +1,20 @@
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
 export async function POST() {
   const userCount = await prisma.user.count();
-  const articleCount = await prisma.gakusaiArticle.count();
+  const existingCount = await prisma.gakusaiArticle.count();
 
-  // 初回セットアップ: ユーザーが0件なら認証なしで管理者ユーザーを作成
+  // 記事が既に存在する場合はスキップ
+  if (existingCount > 0) {
+    return NextResponse.json({
+      message: "記事は既に存在します",
+      count: existingCount,
+    });
+  }
+
+  // 初回セットアップ: ユーザーが0件なら管理者ユーザーと大学を作成
   if (userCount === 0) {
     const hash = await bcrypt.hash("password123", 10);
     await prisma.user.create({
@@ -26,22 +33,6 @@ export async function POST() {
         slug: "example-university",
         description: "学園祭で有名なサンプル大学です。",
       },
-    });
-  }
-
-  // 認証チェック（ユーザーが存在する場合）
-  if (userCount > 0) {
-    const session = await auth();
-    if (!session?.user || session.user.role !== "SYSTEM_ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-  }
-
-  const existingCount = await prisma.gakusaiArticle.count();
-  if (existingCount > 0) {
-    return NextResponse.json({
-      message: "記事は既に存在します",
-      count: existingCount,
     });
   }
 
