@@ -2,9 +2,12 @@ import { PrismaClient } from "../src/generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString?.startsWith("postgresql")) {
-  throw new Error("DATABASE_URL must be a PostgreSQL connection string");
+const connectionString =
+  process.env.DATABASE_URL ??
+  process.env.POSTGRES_PRISMA_URL ??
+  process.env.POSTGRES_URL;
+if (!connectionString?.startsWith("postgresql") && !connectionString?.startsWith("postgres://")) {
+  throw new Error("DATABASE_URL must be a PostgreSQL connection string (postgres:// or postgresql://)");
 }
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
