@@ -19,7 +19,15 @@
 3. 接続文字列をコピー（Connection string）
 4. Vercel の **Environment Variables** に `DATABASE_URL` を設定
 
-## 2. マイグレーション実行
+## 2. 環境変数がビルドで使えるか確認
+
+Vercel の **Settings** → **Environment Variables** で次を確認してください:
+
+- `DATABASE_URL` が存在する
+- **Production**（と **Preview**）にチェックが入っている
+- 接続直後は再デプロイが必要な場合があります
+
+## 3. マイグレーション実行
 
 Vercel にデプロイすると、ビルド時に自動で `prisma migrate deploy` が実行され、テーブルが作成されます。
 
@@ -31,7 +39,7 @@ npx prisma migrate deploy
 npx prisma db seed  # 初期データ投入（任意）
 ```
 
-## 3. 環境変数一覧
+## 4. 環境変数一覧
 
 | 変数名 | 説明 |
 |--------|------|
