@@ -11,16 +11,20 @@ export default async function ThemePage({
   const yearNum = parseInt(year, 10);
   if (isNaN(yearNum)) notFound();
 
-  const university = await prisma.university.findUnique({
-    where: { slug },
-    include: {
-      festivals: {
-        where: { year: yearNum, status: "published" },
-        include: { theme: true },
+  let university;
+  try {
+    university = await prisma.university.findUnique({
+      where: { slug },
+      include: {
+        festivals: {
+          where: { year: yearNum, status: "published" },
+          include: { theme: true },
+        },
       },
-    },
-  });
-
+    });
+  } catch {
+    notFound();
+  }
   const festival = university?.festivals[0];
   const theme = festival?.theme;
   if (!university || !festival) notFound();

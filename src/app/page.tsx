@@ -5,35 +5,47 @@ import { newsItems, sponsor } from "@/lib/news";
 export default async function HomePage() {
   const [universities, newUniversities, highlights, gakusaiArticles] =
     await Promise.all([
-    prisma.university.findMany({
-      orderBy: { name: "asc" },
-      include: {
-        festivals: {
-          where: { status: "published" },
-          orderBy: { year: "desc" },
-          take: 1,
+    (async () => {
+      try {
+        return await prisma.university.findMany({
+          orderBy: { name: "asc" },
           include: {
-            chairperson: { include: { user: true } },
-            theme: true,
+            festivals: {
+              where: { status: "published" },
+              orderBy: { year: "desc" },
+              take: 1,
+              include: {
+                chairperson: { include: { user: true } },
+                theme: true,
+              },
+            },
           },
-        },
-      },
-    }),
-    prisma.university.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 6,
-      include: {
-        festivals: {
-          where: { status: "published" },
-          orderBy: { year: "desc" },
-          take: 1,
+        });
+      } catch {
+        return [];
+      }
+    })(),
+    (async () => {
+      try {
+        return await prisma.university.findMany({
+          orderBy: { createdAt: "desc" },
+          take: 6,
           include: {
-            theme: true,
-            chairperson: { include: { user: true } },
+            festivals: {
+              where: { status: "published" },
+              orderBy: { year: "desc" },
+              take: 1,
+              include: {
+                theme: true,
+                chairperson: { include: { user: true } },
+              },
+            },
           },
-        },
-      },
-    }),
+        });
+      } catch {
+        return [];
+      }
+    })(),
     (async () => {
       try {
         return await prisma.festivalHighlight.findMany({

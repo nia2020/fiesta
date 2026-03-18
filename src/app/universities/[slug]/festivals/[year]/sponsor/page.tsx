@@ -11,22 +11,31 @@ export default async function SponsorPage({
   const yearNum = parseInt(year, 10);
   if (isNaN(yearNum)) notFound();
 
-  const university = await prisma.university.findUnique({
-    where: { slug },
-    include: {
-      festivals: {
-        where: { year: yearNum, status: "published" },
+  let university;
+  try {
+    university = await prisma.university.findUnique({
+      where: { slug },
+      include: {
+        festivals: {
+          where: { year: yearNum, status: "published" },
+        },
       },
-    },
-  });
-
+    });
+  } catch {
+    notFound();
+  }
   const festival = university?.festivals[0];
   if (!university || !festival) notFound();
 
-  const plans = await prisma.sponsorPlan.findMany({
-    where: { festivalId: festival.id },
-    orderBy: { displayOrder: "asc" },
-  });
+  let plans: Awaited<ReturnType<typeof prisma.sponsorPlan.findMany>>;
+  try {
+    plans = await prisma.sponsorPlan.findMany({
+      where: { festivalId: festival.id },
+      orderBy: { displayOrder: "asc" },
+    });
+  } catch {
+    plans = [];
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">

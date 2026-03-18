@@ -11,24 +11,33 @@ export default async function SuccessionPage({
   const yearNum = parseInt(year, 10);
   if (isNaN(yearNum)) notFound();
 
-  const university = await prisma.university.findUnique({
-    where: { slug },
-    include: {
-      festivals: {
-        where: { year: yearNum, status: "published" },
+  let university;
+  try {
+    university = await prisma.university.findUnique({
+      where: { slug },
+      include: {
+        festivals: {
+          where: { year: yearNum, status: "published" },
+        },
       },
-    },
-  });
-
+    });
+  } catch {
+    notFound();
+  }
   const festival = university?.festivals[0];
   if (!university || !festival) notFound();
 
-  const allChairs = await prisma.chairperson.findMany({
-    where: {
-      festival: { universityId: university.id },
-    },
-    include: { user: true },
-  });
+  let allChairs;
+  try {
+    allChairs = await prisma.chairperson.findMany({
+      where: {
+        festival: { universityId: university.id },
+      },
+      include: { user: true },
+    });
+  } catch {
+    notFound();
+  }
   const chairMap = new Map(allChairs.map((c) => [c.id, c]));
 
   const chain: Array<{

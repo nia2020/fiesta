@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 
-export default async function UniversitiesPage() {
-  const universities = await prisma.university.findMany({
+const universitiesQuery = () =>
+  prisma.university.findMany({
     orderBy: { name: "asc" },
     include: {
       festivals: {
@@ -16,6 +16,14 @@ export default async function UniversitiesPage() {
       },
     },
   });
+
+export default async function UniversitiesPage() {
+  let universities: Awaited<ReturnType<typeof universitiesQuery>> = [];
+  try {
+    universities = await universitiesQuery();
+  } catch {
+    // DB接続不可時（本番でSQLite等）は空配列で表示
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">

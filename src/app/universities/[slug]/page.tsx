@@ -8,20 +8,24 @@ export default async function UniversityPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const university = await prisma.university.findUnique({
-    where: { slug },
-    include: {
-      festivals: {
-        where: { status: "published" },
-        orderBy: { year: "desc" },
-        include: {
-          chairperson: { include: { user: true } },
-          theme: true,
+  let university;
+  try {
+    university = await prisma.university.findUnique({
+      where: { slug },
+      include: {
+        festivals: {
+          where: { status: "published" },
+          orderBy: { year: "desc" },
+          include: {
+            chairperson: { include: { user: true } },
+            theme: true,
+          },
         },
       },
-    },
-  });
-
+    });
+  } catch {
+    notFound();
+  }
   if (!university) notFound();
 
   const latestFest = university.festivals[0];

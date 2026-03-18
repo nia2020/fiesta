@@ -9,23 +9,32 @@ interface ArticlePageProps {
 
 export async function generateMetadata({ params }: ArticlePageProps) {
   const { id } = await params;
-  const article = await prisma.gakusaiArticle.findUnique({
-    where: { id },
-    include: { sections: { orderBy: { displayOrder: "asc" } } },
-  });
-  if (!article) return { title: "記事が見つかりません" };
-  return {
-    title: `${article.title} | 学祭がくれたもの`,
-    description: article.excerpt,
-  };
+  try {
+    const article = await prisma.gakusaiArticle.findUnique({
+      where: { id },
+      include: { sections: { orderBy: { displayOrder: "asc" } } },
+    });
+    if (!article) return { title: "記事が見つかりません" };
+    return {
+      title: `${article.title} | 学祭がくれたもの`,
+      description: article.excerpt,
+    };
+  } catch {
+    return { title: "記事が見つかりません" };
+  }
 }
 
 export default async function GakusaiArticlePage({ params }: ArticlePageProps) {
   const { id } = await params;
-  const article = await prisma.gakusaiArticle.findUnique({
-    where: { id },
-    include: { sections: { orderBy: { displayOrder: "asc" } } },
-  });
+  let article;
+  try {
+    article = await prisma.gakusaiArticle.findUnique({
+      where: { id },
+      include: { sections: { orderBy: { displayOrder: "asc" } } },
+    });
+  } catch {
+    notFound();
+  }
   if (!article) notFound();
 
   const sections = article.sections.map((s) => ({

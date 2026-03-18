@@ -11,23 +11,27 @@ export default async function ChairpersonPage({
   const yearNum = parseInt(year, 10);
   if (isNaN(yearNum)) notFound();
 
-  const university = await prisma.university.findUnique({
-    where: { slug },
-    include: {
-      festivals: {
-        where: { year: yearNum, status: "published" },
-        include: {
-          chairperson: {
-            include: {
-              user: true,
-              predecessor: { include: { user: true } },
+  let university;
+  try {
+    university = await prisma.university.findUnique({
+      where: { slug },
+      include: {
+        festivals: {
+          where: { year: yearNum, status: "published" },
+          include: {
+            chairperson: {
+              include: {
+                user: true,
+                predecessor: { include: { user: true } },
+              },
             },
           },
         },
       },
-    },
-  });
-
+    });
+  } catch {
+    notFound();
+  }
   const festival = university?.festivals[0];
   const chairperson = festival?.chairperson;
   if (!university || !festival || !chairperson) notFound();

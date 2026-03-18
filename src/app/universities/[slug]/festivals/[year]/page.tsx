@@ -11,19 +11,23 @@ export default async function FestivalPage({
   const yearNum = parseInt(year, 10);
   if (isNaN(yearNum)) notFound();
 
-  const university = await prisma.university.findUnique({
-    where: { slug },
-    include: {
-      festivals: {
-        where: { year: yearNum, status: "published" },
-        include: {
-          chairperson: { include: { user: true } },
-          theme: true,
+  let university;
+  try {
+    university = await prisma.university.findUnique({
+      where: { slug },
+      include: {
+        festivals: {
+          where: { year: yearNum, status: "published" },
+          include: {
+            chairperson: { include: { user: true } },
+            theme: true,
+          },
         },
       },
-    },
-  });
-
+    });
+  } catch {
+    notFound();
+  }
   const festival = university?.festivals[0];
   if (!university || !festival) notFound();
 
