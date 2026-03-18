@@ -1,28 +1,16 @@
-import type { PrismaClient } from "@/generated/prisma";
+import { PrismaClient } from "@/generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | null };
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
-function createPrismaClient(): PrismaClient | null {
-  try {
-    const { PrismaClient: PC } = require("@/generated/prisma");
-    const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
-    const adapter = new PrismaBetterSqlite3({
-      url: process.env.DATABASE_URL || "file:./dev.db",
-    });
-    return new PC({ adapter });
-  } catch {
-    return null;
+function createPrismaClient() {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString?.startsWith("postgresql")) {
+    throw new Error("DATABASE_URL must be a PostgreSQL connection string (postgresql://...)");
   }
+  const adapter = new PrismaPg({ connectionString });
+  return new PrismaClient({ adapter });
 }
 
-function createThrowProxy(): PrismaClient {
-  return new Proxy({} as PrismaClient, {
-    get() {
-      throw new Error("DB_UNAVAILABLE");
-    },
-  });
-}
-
-const raw = globalForPrisma.prisma ?? createPrismaClient();
-export const prisma: PrismaClient = raw ?? createThrowProxy();
-if (process.env.NODE_ENV !== "production" && raw) globalForPrisma.prisma = raw;
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

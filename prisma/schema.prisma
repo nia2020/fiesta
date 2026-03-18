@@ -1,5 +1,6 @@
 // 学園祭実行委員会サイト - データベーススキーマ
-// 開発時はSQLite、本番はPostgreSQL推奨
+// 本番: PostgreSQL (Vercel Postgres / Neon 等)
+// 開発: DATABASE_URL に postgresql:// を指定
 
 generator client {
   provider = "prisma-client-js"
@@ -7,7 +8,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
